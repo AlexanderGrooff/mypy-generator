@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+import sys
+from src.input import parse_args
+from src.parser import find_python_files, file_to_module, functions_in_module, used_functions_in_function
+
+if __name__ == "__main__":
+    args = parse_args(sys.argv[1:])
+    python_files = find_python_files(args.path)
+    print("Generating type annotations for the following Python files: {}".format(", ".join(python_files)))
+    for file in python_files:
+        try:
+            module = file_to_module(file)
+        except ModuleNotFoundError:
+            print("No module found in {}".format(file))
+            continue
+        functions = functions_in_module(module)
+        print("Functions in file {}: {}".format(file, functions))
+        for f in functions:
+            print("{} is using the following functions: {}".format(f, used_functions_in_function(f)))
